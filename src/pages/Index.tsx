@@ -193,7 +193,7 @@ const Index = () => {
         return;
       }
 
-      const whatsappUrl = `https://wa.me/919876543210?text=${message}`;
+      const whatsappUrl = `https://wa.me/917010213381?text=${message}`;
       window.open(whatsappUrl, "_blank");
 
       toast({
@@ -430,7 +430,7 @@ const Index = () => {
           <p className="text-xs md:text-sm text-muted-foreground space-y-1">
             <span className="block md:inline">📍 123 Sweet Street, Delhi</span>
             <span className="hidden md:inline"> | </span>
-            <span className="block md:inline">☎️ +91 98765 43210</span>
+            <span className="block md:inline">☎️ +91 70102 13381</span>
             <span className="hidden md:inline"> | </span>
             <span className="block md:inline">🕐 Open Daily 9 AM - 9 PM</span>
           </p>
