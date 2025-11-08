@@ -234,16 +234,43 @@ const Index = () => {
 
       {/* Search & Filter Section */}
       <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex-1"></div>
+        <div className="container mx-auto px-4 py-3 md:py-6">
+          {/* Category Filters - Top Priority on Mobile */}
+          <div className="flex gap-2 overflow-x-auto pb-3 md:pb-4 scrollbar-hide mb-3 md:mb-6 -mx-4 px-4">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant="category"
+                size="default"
+                data-active={selectedCategory === category}
+                onClick={() => setSelectedCategory(category)}
+                className="font-semibold whitespace-nowrap flex-shrink-0 min-w-fit"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+
+          {/* Search Bar and Cart */}
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search sweets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 md:pl-10 h-10 md:h-12 bg-card border-border focus:border-primary"
+              />
+            </div>
+            
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
-                <Button size="lg" className="relative shadow-md">
-                  <ShoppingCart className="h-5 w-5" />
-                  <span className="ml-2">Cart</span>
+                <Button size="default" className="relative shadow-md flex-shrink-0 md:px-6">
+                  <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="ml-2 hidden sm:inline">Cart</span>
                   {getTotalItems() > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                    <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-xs font-bold">
                       {getTotalItems()}
                     </span>
                   )}
@@ -251,59 +278,59 @@ const Index = () => {
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
                 <SheetHeader>
-                  <SheetTitle className="text-2xl">Your Cart</SheetTitle>
+                  <SheetTitle className="text-xl md:text-2xl">Your Cart</SheetTitle>
                 </SheetHeader>
                 
-                <div className="mt-8 space-y-4">
+                <div className="mt-6 md:mt-8 space-y-3 md:space-y-4">
                   {cart.length === 0 ? (
                     <div className="text-center py-12">
-                      <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-lg text-muted-foreground">Your cart is empty</p>
-                      <p className="text-sm text-muted-foreground mt-2">Add some delicious sweets to get started!</p>
+                      <ShoppingCart className="h-12 w-12 md:h-16 md:w-16 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-base md:text-lg text-muted-foreground">Your cart is empty</p>
+                      <p className="text-xs md:text-sm text-muted-foreground mt-2">Add some delicious sweets to get started!</p>
                     </div>
                   ) : (
                     <>
                       {cart.map((item) => (
                         <Card key={item.id} className="overflow-hidden">
-                          <div className="flex gap-4 p-4">
+                          <div className="flex gap-3 md:gap-4 p-3 md:p-4">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-20 h-20 object-cover rounded-lg"
+                              className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg flex-shrink-0"
                             />
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-foreground">{item.name}</h4>
-                              <p className="text-sm text-muted-foreground">₹{item.price}/kg</p>
-                              <div className="flex items-center gap-3 mt-2">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-foreground text-sm md:text-base">{item.name}</h4>
+                              <p className="text-xs md:text-sm text-muted-foreground">₹{item.price}/kg</p>
+                              <div className="flex items-center gap-2 md:gap-3 mt-2">
                                 <Button
                                   size="icon"
                                   variant="outline"
-                                  className="h-8 w-8"
+                                  className="h-7 w-7 md:h-8 md:w-8"
                                   onClick={() => updateQuantity(item.id, -1)}
                                 >
-                                  <Minus className="h-4 w-4" />
+                                  <Minus className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
-                                <span className="font-semibold w-8 text-center">{item.quantity}</span>
+                                <span className="font-semibold w-6 md:w-8 text-center text-sm md:text-base">{item.quantity}</span>
                                 <Button
                                   size="icon"
                                   variant="outline"
-                                  className="h-8 w-8"
+                                  className="h-7 w-7 md:h-8 md:w-8"
                                   onClick={() => updateQuantity(item.id, 1)}
                                 >
-                                  <Plus className="h-4 w-4" />
+                                  <Plus className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  className="h-8 w-8 ml-auto text-destructive hover:text-destructive"
+                                  className="h-7 w-7 md:h-8 md:w-8 ml-auto text-destructive hover:text-destructive"
                                   onClick={() => removeFromCart(item.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
                                 </Button>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold text-lg">₹{item.price * item.quantity}</p>
+                            <div className="text-right flex-shrink-0">
+                              <p className="font-bold text-base md:text-lg">₹{item.price * item.quantity}</p>
                             </div>
                           </div>
                         </Card>
@@ -313,16 +340,16 @@ const Index = () => {
                 </div>
 
                 {cart.length > 0 && (
-                  <SheetFooter className="mt-8 flex-col gap-4">
-                    <div className="flex justify-between items-center text-lg font-bold border-t border-border pt-4">
+                  <SheetFooter className="mt-6 md:mt-8 flex-col gap-3 md:gap-4">
+                    <div className="flex justify-between items-center text-base md:text-lg font-bold border-t border-border pt-3 md:pt-4">
                       <span>Total:</span>
-                      <span className="text-2xl bg-gradient-primary bg-clip-text text-transparent">
+                      <span className="text-xl md:text-2xl bg-gradient-primary bg-clip-text text-transparent">
                         ₹{getTotalPrice()}
                       </span>
                     </div>
                     <Button 
                       size="lg" 
-                      className="w-full shadow-lg hover:shadow-xl transition-all text-base"
+                      className="w-full shadow-lg hover:shadow-xl transition-all text-sm md:text-base"
                       onClick={placeOrder}
                     >
                       Place Order via WhatsApp
@@ -335,39 +362,12 @@ const Index = () => {
               </SheetContent>
             </Sheet>
           </div>
-          {/* Search Bar */}
-          <div className="relative max-w-md mx-auto mb-6">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search sweets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12 bg-card border-border focus:border-primary"
-            />
-          </div>
-
-          {/* Category Filters */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant="category"
-                size="lg"
-                data-active={selectedCategory === category}
-                onClick={() => setSelectedCategory(category)}
-                className="font-semibold"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* Menu Grid */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="container mx-auto px-4 py-6 md:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {filteredSweets.map((sweet) => (
             <Card 
               key={sweet.id}
@@ -382,31 +382,31 @@ const Index = () => {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-2xl font-bold text-foreground">{sweet.name}</h3>
-                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full border border-primary/20">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex items-start justify-between mb-2 gap-2">
+                  <h3 className="text-lg md:text-2xl font-bold text-foreground">{sweet.name}</h3>
+                  <span className="inline-block px-2 md:px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full border border-primary/20 whitespace-nowrap flex-shrink-0">
                     {sweet.category}
                   </span>
                 </div>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   {sweet.description}
                 </p>
               </CardContent>
-              <CardFooter className="px-6 pb-6 pt-0 flex items-center justify-between">
+              <CardFooter className="px-4 md:px-6 pb-4 md:pb-6 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  <span className="text-2xl md:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                     ₹{sweet.price}
                   </span>
-                  <span className="text-muted-foreground text-sm">/kg</span>
+                  <span className="text-muted-foreground text-xs md:text-sm">/kg</span>
                 </div>
                 <Button 
-                  size="lg"
-                  className="shadow-md hover:shadow-lg transition-all"
+                  size="default"
+                  className="shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
                   onClick={() => addToCart(sweet)}
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
+                  <span className="text-sm md:text-base">Add to Cart</span>
                 </Button>
               </CardFooter>
             </Card>
@@ -414,21 +414,25 @@ const Index = () => {
         </div>
 
         {filteredSweets.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-2xl text-muted-foreground">No sweets found matching your search.</p>
+          <div className="text-center py-12 md:py-20 px-4">
+            <p className="text-lg md:text-2xl text-muted-foreground">No sweets found matching your search.</p>
           </div>
         )}
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted/30 border-t border-border mt-20">
-        <div className="container mx-auto px-4 py-12 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Shree Mithai Bhandar</h2>
-          <p className="text-muted-foreground mb-4">
+      <footer className="bg-muted/30 border-t border-border mt-12 md:mt-20">
+        <div className="container mx-auto px-4 py-8 md:py-12 text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Shree Mithai Bhandar</h2>
+          <p className="text-sm md:text-base text-muted-foreground mb-4">
             Experience the authentic taste of traditional Indian sweets
           </p>
-          <p className="text-sm text-muted-foreground">
-            📍 123 Sweet Street, Delhi | ☎️ +91 98765 43210 | 🕐 Open Daily 9 AM - 9 PM
+          <p className="text-xs md:text-sm text-muted-foreground space-y-1">
+            <span className="block md:inline">📍 123 Sweet Street, Delhi</span>
+            <span className="hidden md:inline"> | </span>
+            <span className="block md:inline">☎️ +91 98765 43210</span>
+            <span className="hidden md:inline"> | </span>
+            <span className="block md:inline">🕐 Open Daily 9 AM - 9 PM</span>
           </p>
         </div>
       </footer>
