@@ -361,16 +361,16 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Premium gradient */}
+      {/* Hero Section - Premium green gradient */}
       <section className="relative h-[150px] md:h-[200px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-maroon via-maroon/90 to-saffron/80"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(38_90%_55%_/_0.15),_transparent_50%)]"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-golden/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary/80"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(140_40%_45%_/_0.2),_transparent_50%)]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent"></div>
         <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-2 text-golden drop-shadow-lg">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-2 text-primary-foreground drop-shadow-lg">
             Sri Enippagam
           </h1>
-          <p className="text-sm md:text-lg text-white/90 max-w-2xl font-medium tracking-wide">
+          <p className="text-sm md:text-lg text-primary-foreground/90 max-w-2xl font-medium tracking-wide">
             The Taste of Tradition • Authentic Indian sweets & snacks handcrafted for every celebration.
           </p>
         </div>
