@@ -1,30 +1,30 @@
 
+
 export interface Sweet {
     id: number;
     name: string;
     category: string;
     subCategory: string;
     image: string;
+    imageFile?: string; // Filename for lazy loading
     description: string;
     price: number;
     order: number;
 }
 
-// Load images eagerly
-const sweetImages = import.meta.glob('@/assets/sweets/*.{png,jpg,jpeg,svg,webp}', { eager: true });
-const karamImages = import.meta.glob('@/assets/kaaram/*.{png,jpg,jpeg,svg,webp}', { eager: true });
-const chatImages = import.meta.glob('@/assets/chat/*.{png,jpg,jpeg,svg,webp}', { eager: true });
+// Load images lazily for better performance
+const sweetImages = import.meta.glob('@/assets/sweets/*.{png,jpg,jpeg,svg,webp}');
+const karamImages = import.meta.glob('@/assets/kaaram/*.{png,jpg,jpeg,svg,webp}');
+const chatImages = import.meta.glob('@/assets/chat/*.{png,jpg,jpeg,svg,webp}');
 
-// Helper to create a filename -> module map
+// Helper to create a filename -> module loader map
 const createMap = (glob: Record<string, any>) => {
-    const map: Record<string, string> = {};
+    const map: Record<string, () => Promise<any>> = {};
     for (const key in glob) {
         const filename = key.split('/').pop()!;
-        // Handle URL encoded filenames if necessary, but usually glob keys are decoded or raw
-        // We act conservative and try both decoded and raw matching if needed, 
-        // but here we just store by filename.
-        map[decodeURIComponent(filename)] = (glob[key] as any).default;
-        map[filename] = (glob[key] as any).default;
+        // Store the loader function for lazy loading
+        map[decodeURIComponent(filename)] = glob[key];
+        map[filename] = glob[key];
     }
     return map;
 };
@@ -222,9 +222,10 @@ const rawItems: { file: string; category: string; price?: number }[] = [
     { file: "Veg_Cutlet.png", category: "Chat", price: 60 },
 ];
 
-export const items: Sweet[] = rawItems.map((item, index) => {
+// Create items with lazy-loaded images
+const itemsPromises = rawItems.map(async (item, index) => {
     const name = formatName(item.file);
-    let imageMap: Record<string, string>;
+    let imageMap: Record<string, () => Promise<any>>;
     let defaultPrice = 100;
     let description = "";
 
@@ -242,11 +243,19 @@ export const items: Sweet[] = rawItems.map((item, index) => {
         description = `Authentic ${name} with tangy and spicy flavors.`;
     }
 
-    // Try finding image with decoding or exact match
-    let image = imageMap[item.file] || imageMap[decodeURIComponent(item.file)];
-    if (!image) {
-        console.warn(`Image not found for ${item.file}`);
-        image = ""; // Placeholder or empty
+    // Try finding image loader with decoding or exact match
+    const imageLoader = imageMap[item.file] || imageMap[decodeURIComponent(item.file)];
+    let image = "";
+
+    if (imageLoader) {
+        try {
+            const module = await imageLoader();
+            image = module.default;
+        } catch (error) {
+            console.warn(`Failed to load image for ${item.file}`, error);
+        }
+    } else {
+        console.warn(`Image loader not found for ${item.file}`);
     }
 
     return {
@@ -261,6 +270,40 @@ export const items: Sweet[] = rawItems.map((item, index) => {
     };
 });
 
+// Export items as a promise that resolves to the array
+export const itemsPromise = Promise.all(itemsPromises);
+
+// For backwards compatibility, we'll need to handle this differently
+// Let's create a synchronous version with placeholder that gets updated
+export const items: Sweet[] = rawItems.map((item, index) => {
+    const name = formatName(item.file);
+    let defaultPrice = 100;
+    let description = "";
+
+    if (item.category === 'Sweets') {
+        defaultPrice = 450;
+        description = `Delicious homemade ${name} made with premium ghee and ingredients.`;
+    } else if (item.category === 'Karam') {
+        defaultPrice = 350;
+        description = `Crunchy and spicy ${name}, perfect for tea time snacks.`;
+    } else {
+        defaultPrice = 80;
+        description = `Authentic ${name} with tangy and spicy flavors.`;
+    }
+
+    return {
+        id: index + 1,
+        name: name,
+        category: item.category,
+        subCategory: getSubCategory(name, item.category),
+        image: "", // Will be loaded lazily by component
+        imageFile: item.file, // Store filename for lazy loading
+        description: description,
+        price: item.price || defaultPrice,
+        order: index + 1
+    } as Sweet;
+});
+
 export const categories = ["All", "Sweets", "Karam", "Chat"];
 
 export const getSubCategories = (category: string): string[] => {
@@ -269,4 +312,19 @@ export const getSubCategories = (category: string): string[] => {
     const relevantItems = items.filter(item => item.category === category);
     const subCats = new Set(relevantItems.map(item => item.subCategory));
     return ["All", ...Array.from(subCats).sort()];
+};
+
+// Helper to get image loader for a specific file
+export const getImageLoader = (filename: string, category: string): (() => Promise<any>) | null => {
+    let imageMap: Record<string, () => Promise<any>>;
+
+    if (category === 'Sweets') {
+        imageMap = sMap;
+    } else if (category === 'Karam') {
+        imageMap = kMap;
+    } else {
+        imageMap = cMap;
+    }
+
+    return imageMap[filename] || imageMap[decodeURIComponent(filename)] || null;
 };

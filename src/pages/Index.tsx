@@ -8,6 +8,9 @@ import { z } from "zod";
 import { items as sweets, categories, Sweet, getSubCategories } from "@/data/items";
 import { ProductCard } from "@/components/ProductCard";
 import { MobileFilters } from "@/components/MobileFilters";
+import { CartImage } from "@/components/CartImage";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface CartItem extends Sweet {
   quantity: number;
@@ -31,6 +34,7 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [isCustomerDetailsOpen, setIsCustomerDetailsOpen] = useState(false);
 
   // We can pick a random image for the hero or keep it hardcoded if we want a specific one
   // For now let's just use the first item's image or a fallback
@@ -236,8 +240,9 @@ const Index = () => {
                       {cart.map((item) => (
                         <div key={item.id} className="flex gap-4 p-3 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-colors">
                           <div className="h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-muted/20 flex-shrink-0 border border-border/30">
-                            <img
-                              src={item.image}
+                            <CartImage
+                              imageFile={item.imageFile}
+                              category={item.category}
                               alt={item.name}
                               className="w-full h-full object-contain p-1"
                             />
@@ -289,27 +294,32 @@ const Index = () => {
                 {cart.length > 0 && (
                   <div className="mt-auto pt-6 border-t border-border bg-background">
                     <div className="space-y-4 mb-6">
-                      <div className="space-y-3">
-                        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          Your Name <span className="text-muted-foreground font-normal">(Optional)</span>
-                        </label>
-                        <Input
-                          placeholder="Enter your name"
-                          value={customerName}
-                          onChange={(e) => setCustomerName(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          Delivery Address <span className="text-muted-foreground font-normal">(Optional)</span>
-                        </label>
-                        <textarea
-                          className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          placeholder="Enter your full address"
-                          value={customerAddress}
-                          onChange={(e) => setCustomerAddress(e.target.value)}
-                        />
-                      </div>
+                      <Collapsible open={isCustomerDetailsOpen} onOpenChange={setIsCustomerDetailsOpen}>
+                        <CollapsibleTrigger asChild>
+                          <button className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-2">
+                            <span>Add delivery details (Optional)</span>
+                            <ChevronDown className={`h-4 w-4 transition-transform ${isCustomerDetailsOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-3">
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Your name"
+                              value={customerName}
+                              onChange={(e) => setCustomerName(e.target.value)}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <textarea
+                              className="flex min-h-[50px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Delivery address"
+                              value={customerAddress}
+                              onChange={(e) => setCustomerAddress(e.target.value)}
+                            />
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
 
                       <div className="flex justify-between items-center text-sm text-muted-foreground pt-2">
                         <span>Subtotal ({getTotalItems()} items)</span>
