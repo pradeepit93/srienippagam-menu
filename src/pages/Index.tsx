@@ -361,35 +361,40 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Elegant green gradient matching brand */}
+      {/* Hero Section - Warm taupe with golden accents and decorative border */}
       <section className="relative h-[180px] md:h-[220px] overflow-hidden">
-        {/* Main background - rich green gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-700"></div>
+        {/* Main background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-500 via-stone-600 to-stone-500"></div>
         
-        {/* Subtle glow overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(45_80%_70%_/_0.1),_transparent_60%)]"></div>
-        
-        {/* Decorative top border - subtle gold accent */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/70 to-transparent"></div>
+        {/* Decorative top border - traditional Indian pattern */}
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600"></div>
+        <div className="absolute top-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
         
         {/* Decorative bottom border */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/70 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600"></div>
+        <div className="absolute bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+        
+        {/* Subtle decorative pattern overlay */}
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30M15 15L45 45M45 15L15 45' stroke='%23fbbf24' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px'
+        }}></div>
         
         {/* Content */}
         <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold italic mb-3 text-amber-100 drop-shadow-lg tracking-wide">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold italic mb-3 text-amber-200 drop-shadow-md tracking-wide">
             The Taste of Tradition
           </h1>
-          <p className="text-sm md:text-lg text-emerald-100/90 max-w-2xl font-light tracking-wide">
+          <p className="text-sm md:text-lg text-stone-200 max-w-2xl font-light tracking-wide">
             Authentic Indian sweets & snacks handcrafted for every celebration.
           </p>
         </div>
         
-        {/* Corner decorative elements - subtle */}
-        <div className="absolute top-5 left-6 w-6 h-6 border-l border-t border-amber-300/30"></div>
-        <div className="absolute top-5 right-6 w-6 h-6 border-r border-t border-amber-300/30"></div>
-        <div className="absolute bottom-5 left-6 w-6 h-6 border-l border-b border-amber-300/30"></div>
-        <div className="absolute bottom-5 right-6 w-6 h-6 border-r border-b border-amber-300/30"></div>
+        {/* Corner decorative elements */}
+        <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-amber-400/40"></div>
+        <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-amber-400/40"></div>
+        <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-amber-400/40"></div>
+        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-amber-400/40"></div>
       </section>
 
 
