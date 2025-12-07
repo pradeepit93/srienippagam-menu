@@ -180,7 +180,7 @@ const Index = () => {
         <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             {/* Mobile Logo / Brand */}
-            <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight text-primary">
               Sri Enippagam
             </h2>
           </div>
@@ -361,19 +361,16 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Compact on desktop */}
+      {/* Hero Section - Premium gradient */}
       <section className="relative h-[150px] md:h-[200px] overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-br from-maroon via-maroon/90 to-saffron/80"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(38_90%_55%_/_0.15),_transparent_50%)]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-golden/50 to-transparent"></div>
         <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-2 drop-shadow-lg bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent [text-shadow:_0_2px_12px_hsl(142_76%_36%_/_0.3)]">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-2 text-golden drop-shadow-lg">
             Sri Enippagam
           </h1>
-          <p className="text-sm md:text-lg text-primary-foreground/90 max-w-2xl drop-shadow-md font-medium">
+          <p className="text-sm md:text-lg text-white/90 max-w-2xl font-medium tracking-wide">
             The Taste of Tradition • Authentic Indian sweets & snacks handcrafted for every celebration.
           </p>
         </div>
