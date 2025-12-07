@@ -370,11 +370,11 @@ const Index = () => {
           <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold text-saffron mb-2 drop-shadow-lg [text-shadow:_0_2px_12px_hsl(25_95%_53%_/_0.4)]">
-            The Taste of Tradition
+          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-2 drop-shadow-lg bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent [text-shadow:_0_2px_12px_hsl(142_76%_36%_/_0.3)]">
+            Sri Enippagam
           </h1>
-          <p className="text-sm md:text-lg text-golden max-w-2xl drop-shadow-md font-medium [text-shadow:_0_1px_8px_hsl(45_100%_60%_/_0.3)]">
-            Authentic Indian sweets & snacks handcrafted for every celebration.
+          <p className="text-sm md:text-lg text-primary-foreground/90 max-w-2xl drop-shadow-md font-medium">
+            The Taste of Tradition • Authentic Indian sweets & snacks handcrafted for every celebration.
           </p>
         </div>
       </section>
