@@ -11,6 +11,7 @@ import { MobileFilters } from "@/components/MobileFilters";
 import { CartImage } from "@/components/CartImage";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { HeroCarousel } from "@/components/HeroCarousel";
 
 interface CartItem extends Sweet {
   quantity: number;
@@ -361,46 +362,13 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Warm taupe with golden accents and decorative border */}
-      <section className="relative h-[180px] md:h-[220px] overflow-hidden">
-        {/* Main background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-stone-500 via-stone-600 to-stone-500"></div>
-        
-        {/* Decorative top border - traditional Indian pattern with shimmer */}
-        <div className="absolute top-0 left-0 right-0 h-2 shimmer-gold"></div>
-        <div className="absolute top-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
-        
-        {/* Decorative bottom border with shimmer */}
-        <div className="absolute bottom-0 left-0 right-0 h-2 shimmer-gold"></div>
-        <div className="absolute bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
-        
-        {/* Subtle decorative pattern overlay */}
-        <div className="absolute inset-0 opacity-5" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30M15 15L45 45M45 15L15 45' stroke='%23fbbf24' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
-          backgroundSize: '30px 30px'
-        }}></div>
-        
-        {/* Content */}
-        <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold italic mb-3 shimmer-text drop-shadow-md tracking-wide">
-            The Taste of Tradition
-          </h1>
-          <p className="text-sm md:text-lg text-stone-200 max-w-2xl font-light tracking-wide">
-            Authentic Indian sweets & snacks handcrafted for every celebration.
-          </p>
-        </div>
-        
-        {/* Corner decorative elements */}
-        <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-amber-400/40"></div>
-        <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-amber-400/40"></div>
-        <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-amber-400/40"></div>
-        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-amber-400/40"></div>
-      </section>
+      {/* Hero Carousel - Scrollable Promotional Banners */}
+      <HeroCarousel />
 
 
       <main className="container mx-auto px-4 py-6">
         {/* Top Filters */}
-        <div className="sticky top-[105px] md:top-16 z-40 bg-background pt-2 -mx-4 px-4 mb-6">
+        <div className="sticky top-[105px] md:top-[64px] z-40 bg-background pt-2 -mx-4 px-4 mb-6">
           <MobileFilters
             categories={categories}
             subCategories={availableSubCategories}

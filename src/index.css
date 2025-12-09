@@ -8,38 +8,63 @@
   0% {
     background-position: -200% center;
   }
+
   100% {
     background-position: 200% center;
   }
 }
 
-.shimmer-gold {
-  background: linear-gradient(
-    90deg,
-    hsl(43 96% 56%) 0%,
-    hsl(48 96% 70%) 25%,
-    hsl(43 96% 56%) 50%,
-    hsl(48 96% 70%) 75%,
-    hsl(43 96% 56%) 100%
-  );
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px hsl(152 28% 42% / 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 40px hsl(152 28% 42% / 0.5);
+  }
+}
+
+.shimmer-green {
+  background: linear-gradient(90deg,
+      hsl(152 28% 42%) 0%,
+      hsl(150 25% 90%) 25%,
+      hsl(152 28% 42%) 50%,
+      hsl(150 25% 90%) 75%,
+      hsl(152 28% 42%) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }
 
-.shimmer-text {
-  background: linear-gradient(
-    90deg,
-    hsl(43 41% 86%) 0%,
-    hsl(48 96% 80%) 25%,
-    hsl(43 41% 86%) 50%,
-    hsl(48 96% 80%) 75%,
-    hsl(43 41% 86%) 100%
-  );
+.shimmer-text-green {
+  background: linear-gradient(90deg,
+      hsl(0 0% 100%) 0%,
+      hsl(150 25% 95%) 25%,
+      hsl(0 0% 100%) 50%,
+      hsl(150 25% 95%) 75%,
+      hsl(0 0% 100%) 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   animation: shimmer 4s ease-in-out infinite;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
 }
 
 @layer utilities {
@@ -64,59 +89,65 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 45 30% 97%;
-    --foreground: 150 25% 12%;
+    --background: 40 20% 98%;
+    --foreground: 155 25% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 25% 12%;
+    --card-foreground: 155 25% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 25% 12%;
+    --popover-foreground: 155 25% 18%;
 
-    /* Rich forest green - premium traditional aesthetic */
-    --primary: 145 55% 32%;
+    /* Modern sage green - 2024/2025 trend */
+    --primary: 152 28% 42%;
     --primary-foreground: 0 0% 100%;
 
-    /* Light sage green accent */
-    --secondary: 140 40% 45%;
+    /* Warm forest accent */
+    --secondary: 148 32% 38%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 140 15% 92%;
-    --muted-foreground: 150 15% 40%;
+    --muted: 40 15% 95%;
+    --muted-foreground: 152 18% 45%;
 
-    /* Deep emerald accent */
-    --accent: 155 60% 38%;
+    /* Deep olive accent */
+    --accent: 156 35% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 140 20% 88%;
-    --input: 140 20% 88%;
-    --ring: 145 55% 32%;
+    --border: 40 12% 92%;
+    --input: 40 12% 92%;
+    --ring: 152 28% 42%;
 
     --radius: 0.75rem;
 
-    /* Premium Indian sweet shop colors - green theme */
-    --forest: 145 55% 32%;
-    --sage: 140 40% 45%;
-    --emerald: 155 60% 38%;
-    --cream: 45 30% 97%;
-    --warm-bg: 140 20% 98%;
+    /* Modern premium palette - sage & forest tones */
+    --forest: 156 35% 35%;
+    --sage: 152 28% 42%;
+    --olive: 148 32% 38%;
+    --mint: 150 25% 90%;
+    --cream: 40 35% 97%;
+    --warm-bg: 40 20% 98%;
+    --terracotta: 15 45% 62%;
 
-    /* Elegant Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(145 55% 32%) 0%, hsl(140 45% 40%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(145 55% 28%) 0%, hsl(140 50% 35%) 50%, hsl(155 50% 32%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(140 20% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(140 40% 45%) 0%, hsl(155 60% 38%) 100%);
+    /* Contemporary Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(152 28% 42%) 0%, hsl(148 32% 38%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(156 35% 32%) 0%, hsl(152 28% 38%) 50%, hsl(148 32% 42%) 100%);
+    --gradient-hero-overlay: linear-gradient(90deg, hsl(152 28% 42% / 0.92) 0%, hsl(148 32% 38% / 0.88) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(40 20% 98%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(148 32% 38%) 0%, hsl(156 35% 35%) 100%);
+    --gradient-shine: linear-gradient(135deg, hsl(150 25% 90%) 0%, hsl(152 28% 88%) 50%, hsl(150 25% 90%) 100%);
 
     /* Refined Shadows */
-    --shadow-card: 0 4px 20px -2px hsl(145 55% 32% / 0.08);
-    --shadow-hover: 0 12px 40px -8px hsl(145 55% 32% / 0.15);
-    --shadow-glow: 0 0 30px hsl(140 40% 45% / 0.2);
+    --shadow-card: 0 4px 20px -2px hsl(152 28% 42% / 0.08);
+    --shadow-hover: 0 12px 40px -8px hsl(152 28% 42% / 0.15);
+    --shadow-glow: 0 0 40px hsl(148 32% 38% / 0.2);
+    --shadow-hero: 0 20px 60px -10px hsl(156 35% 32% / 0.35);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
