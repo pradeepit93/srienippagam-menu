@@ -366,12 +366,12 @@ const Index = () => {
         {/* Main background */}
         <div className="absolute inset-0 bg-gradient-to-br from-stone-500 via-stone-600 to-stone-500"></div>
         
-        {/* Decorative top border - traditional Indian pattern */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600"></div>
+        {/* Decorative top border - traditional Indian pattern with shimmer */}
+        <div className="absolute top-0 left-0 right-0 h-2 shimmer-gold"></div>
         <div className="absolute top-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
         
-        {/* Decorative bottom border */}
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600"></div>
+        {/* Decorative bottom border with shimmer */}
+        <div className="absolute bottom-0 left-0 right-0 h-2 shimmer-gold"></div>
         <div className="absolute bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
         
         {/* Subtle decorative pattern overlay */}
@@ -382,7 +382,7 @@ const Index = () => {
         
         {/* Content */}
         <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-5xl font-serif font-bold italic mb-3 text-amber-200 drop-shadow-md tracking-wide">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold italic mb-3 shimmer-text drop-shadow-md tracking-wide">
             The Taste of Tradition
           </h1>
           <p className="text-sm md:text-lg text-stone-200 max-w-2xl font-light tracking-wide">
