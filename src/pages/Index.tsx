@@ -154,7 +154,7 @@ const Index = () => {
         return;
       }
 
-      const whatsappUrl = `https://wa.me/917010213381?text=${encodeURIComponent(messageText)}`;
+      const whatsappUrl = `https://wa.me/918870144490?text=${encodeURIComponent(messageText)}`;
       window.open(whatsappUrl, "_blank");
 
       toast({
