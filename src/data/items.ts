@@ -84,7 +84,7 @@ const formatName = (path: string): string => {
 // You can reorder items here to change their display order.
 const rawItems: { file: string; category: string; price?: number }[] = [
     // --- SWEETS ---
-    { file: "Aathira_Paan.png", category: "Sweets", price: 450 },  //
+    { file: "Agra_Paan.png", category: "Sweets", price: 450 },  //
     { file: "Athirasam.jpg", category: "Sweets", price: 460 },
     { file: "Baby_Milk_Cake.png", category: "Sweets", price: 550 },
     { file: "Badam_Burfi.jpg", category: "Sweets", price: 700 },
@@ -157,7 +157,7 @@ const rawItems: { file: string; category: string; price?: number }[] = [
     { file: "Sugarcane_Milk_Halwa.png", category: "Sweets", price: 520 },
     { file: "Then_Mittai.png", category: "Sweets", price: 200 },
     { file: "Thengai_Appam.png", category: "Sweets", price: 280 },
-    { file: "White_Aathira_Paan.png", category: "Sweets", price: 460 },
+    { file: "White_Agra_Paan.png", category: "Sweets", price: 460 },
     { file: "Yellow_Agra_Pan.png", category: "Sweets", price: 460 },
     { file: "elaneer_halwa.jpg", category: "Sweets", price: 520 },
     { file: "karupatti_mysurpa.jpg", category: "Sweets", price: 600 },
