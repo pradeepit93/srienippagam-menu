@@ -444,6 +444,7 @@ const Index = () => {
               <div className="space-y-1 text-xs text-muted-foreground">
                 <p>📍 New Scheme Rd, Pollachi, Tamil Nadu 642001</p>
                 <p>☎️ +91 70102 13381</p>
+                <p>☎️ +91 88701 44490</p>
                 <p>📧 order@srienippagam.com</p>
                 <p>🕐 Open Daily 9 AM - 9 PM</p>
               </div>
