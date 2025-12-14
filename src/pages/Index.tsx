@@ -19,11 +19,15 @@ interface CartItem extends Sweet {
 
 // Validation schema for order data
 const orderSchema = z.object({
-  items: z.array(z.object({
-    name: z.string().max(100),
-    quantity: z.number().min(1).max(100),
-    price: z.number().min(0),
-  })).min(1, "Cart cannot be empty"),
+  items: z
+    .array(
+      z.object({
+        name: z.string().max(100),
+        quantity: z.number().min(1).max(100),
+        price: z.number().min(0),
+      }),
+    )
+    .min(1, "Cart cannot be empty"),
   total: z.number().min(0),
 });
 
@@ -45,32 +49,34 @@ const Index = () => {
     return getSubCategories(selectedCategory);
   }, [selectedCategory]);
 
-  const filteredSweets = sweets.filter((sweet) => {
-    const matchesCategory = selectedCategory === "All" || sweet.category === selectedCategory;
-    const matchesSubCategory = selectedCategory === "All" || selectedSubCategory === "All" || sweet.subCategory === selectedSubCategory;
-    const matchesSearch = sweet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sweet.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSubCategory && matchesSearch;
-  }).sort((a, b) => a.order - b.order);
+  const filteredSweets = sweets
+    .filter((sweet) => {
+      const matchesCategory = selectedCategory === "All" || sweet.category === selectedCategory;
+      const matchesSubCategory =
+        selectedCategory === "All" || selectedSubCategory === "All" || sweet.subCategory === selectedSubCategory;
+      const matchesSearch =
+        sweet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sweet.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSubCategory && matchesSearch;
+    })
+    .sort((a, b) => a.order - b.order);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
     setSelectedSubCategory("All"); // Reset subcategory when main category changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubCategoryChange = (subCategory: string) => {
     setSelectedSubCategory(subCategory);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const addToCart = (sweet: Sweet) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === sweet.id);
       if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === sweet.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+        return prevCart.map((item) => (item.id === sweet.id ? { ...item, quantity: item.quantity + 1 } : item));
       }
       return [...prevCart, { ...sweet, quantity: 1 }];
     });
@@ -123,7 +129,7 @@ const Index = () => {
     try {
       // Validate order data
       const orderData = {
-        items: cart.map(item => ({
+        items: cart.map((item) => ({
           name: item.name,
           quantity: item.quantity,
           price: item.price,
@@ -135,14 +141,11 @@ const Index = () => {
 
       // Create WhatsApp message string (without encoding yet)
       const orderItems = cart
-        .map(
-          (item, index) =>
-            `${index + 1}. ${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`
-        )
+        .map((item, index) => `${index + 1}. ${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`)
         .join("\n");
 
       const total = getTotalPrice();
-      const messageText = `*New Order Request* 🛍️\n------------------\n*Items:*\n${orderItems}\n\n*Total Amount: ₹${total}* 💰\n\n*Customer Details:*\nName: ${customerName || 'Not Provided'}\nAddress: ${customerAddress || 'Not Provided'}\n------------------\n_Sent via Sri Enippagam Web App_`;
+      const messageText = `*New Order Request* 🛍️\n------------------\n*Items:*\n${orderItems}\n\n*Total Amount: ₹${total}* 💰\n\n*Customer Details:*\nName: ${customerName || "Not Provided"}\nAddress: ${customerAddress || "Not Provided"}\n------------------\n_Sent via Sri Enippagam Web App_`;
 
       // Validate message length (WhatsApp has limits)
       if (messageText.length > 2000) {
@@ -175,15 +178,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             {/* Mobile Logo / Brand */}
-            <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight text-primary">
-              Sri Enippagam
-            </h2>
+            <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight text-primary">Sri Enippagam</h2>
           </div>
 
           {/* Desktop Search */}
@@ -228,18 +228,17 @@ const Index = () => {
                       <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
                         Looks like you haven't added any sweets yet. Start shopping to fill it up!
                       </p>
-                      <Button
-                        variant="default"
-                        className="mt-6"
-                        onClick={() => setIsCartOpen(false)}
-                      >
+                      <Button variant="default" className="mt-6" onClick={() => setIsCartOpen(false)}>
                         Start Shopping
                       </Button>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {cart.map((item) => (
-                        <div key={item.id} className="flex gap-4 p-3 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-colors">
+                        <div
+                          key={item.id}
+                          className="flex gap-4 p-3 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-colors"
+                        >
                           <div className="h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-muted/20 flex-shrink-0 border border-border/30">
                             <CartImage
                               imageFile={item.imageFile}
@@ -251,7 +250,9 @@ const Index = () => {
                           <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                             <div>
                               <div className="flex justify-between items-start gap-2">
-                                <h4 className="font-semibold text-foreground text-sm line-clamp-1 font-serif">{item.name}</h4>
+                                <h4 className="font-semibold text-foreground text-sm line-clamp-1 font-serif">
+                                  {item.name}
+                                </h4>
                                 <p className="font-bold text-sm">₹{item.price * item.quantity}</p>
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5">₹{item.price}/kg</p>
@@ -299,7 +300,9 @@ const Index = () => {
                         <CollapsibleTrigger asChild>
                           <button className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-2">
                             <span>Add delivery details (Optional)</span>
-                            <ChevronDown className={`h-4 w-4 transition-transform ${isCustomerDetailsOpen ? 'rotate-180' : ''}`} />
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform ${isCustomerDetailsOpen ? "rotate-180" : ""}`}
+                            />
                           </button>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="space-y-3">
@@ -328,9 +331,7 @@ const Index = () => {
                       </div>
                       <div className="flex justify-between items-center text-base font-bold text-foreground">
                         <span>Total</span>
-                        <span className="text-xl font-serif">
-                          ₹{getTotalPrice()}
-                        </span>
+                        <span className="text-xl font-serif">₹{getTotalPrice()}</span>
                       </div>
                     </div>
                     <Button
@@ -365,7 +366,6 @@ const Index = () => {
       {/* Hero Carousel - Scrollable Promotional Banners */}
       <HeroCarousel />
 
-
       <main className="container mx-auto px-4 py-6">
         {/* Top Filters */}
         <div className="sticky top-[105px] md:top-[64px] z-40 bg-background pt-2 -mx-4 px-4 mb-6">
@@ -382,8 +382,12 @@ const Index = () => {
         {/* Product Grid */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">
-            {selectedCategory === 'All' ? 'All Products' : selectedCategory}
-            {selectedSubCategory !== 'All' && <span className="text-muted-foreground text-sm md:text-base font-normal ml-2">/ {selectedSubCategory}</span>}
+            {selectedCategory === "All" ? "All Products" : selectedCategory}
+            {selectedSubCategory !== "All" && (
+              <span className="text-muted-foreground text-sm md:text-base font-normal ml-2">
+                / {selectedSubCategory}
+              </span>
+            )}
           </h2>
           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
             {filteredSweets.length} Items
@@ -393,11 +397,7 @@ const Index = () => {
         {filteredSweets.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
             {filteredSweets.map((sweet) => (
-              <ProductCard
-                key={sweet.id}
-                sweet={sweet}
-                onAddToCart={addToCart}
-              />
+              <ProductCard key={sweet.id} sweet={sweet} onAddToCart={addToCart} />
             ))}
           </div>
         ) : (
@@ -409,10 +409,15 @@ const Index = () => {
             <p className="text-sm text-muted-foreground max-w-sm mx-auto">
               We couldn't find any items matching your current filters.
             </p>
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("All");
-            }}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("All");
+              }}
+            >
               Clear All Filters
             </Button>
           </div>
@@ -433,9 +438,27 @@ const Index = () => {
             <div className="text-center">
               <h3 className="font-semibold text-foreground mb-2 text-sm">Quick Links</h3>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><button onClick={() => handleCategoryChange('All')} className="hover:text-primary transition-colors">Home</button></li>
-                <li><button onClick={() => handleCategoryChange('Sweets')} className="hover:text-primary transition-colors">Sweets</button></li>
-                <li><button onClick={() => handleCategoryChange('Karam')} className="hover:text-primary transition-colors">Snacks</button></li>
+                <li>
+                  <button onClick={() => handleCategoryChange("All")} className="hover:text-primary transition-colors">
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleCategoryChange("Sweets")}
+                    className="hover:text-primary transition-colors"
+                  >
+                    Sweets
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleCategoryChange("Karam")}
+                    className="hover:text-primary transition-colors"
+                  >
+                    Snacks
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -443,7 +466,6 @@ const Index = () => {
               <h3 className="font-semibold text-foreground mb-2 text-sm">Contact Us</h3>
               <div className="space-y-1 text-xs text-muted-foreground">
                 <p>📍 New Scheme Rd, Pollachi, Tamil Nadu 642001</p>
-                <p>☎️ +91 70102 13381</p>
                 <p>☎️ +91 88701 44490</p>
                 <p>📧 order@srienippagam.com</p>
                 <p>🕐 Open Daily 9 AM - 9 PM</p>
