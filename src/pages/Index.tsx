@@ -14,7 +14,9 @@ import { ChevronDown } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
 
 interface CartItem extends Sweet {
+  cartId: number;
   quantity: number;
+  unitLabel?: string; // e.g., 'kg', '250g', 'plate'
 }
 
 // Validation schema for order data
@@ -72,25 +74,41 @@ const Index = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const addToCart = (sweet: Sweet) => {
+  const addToCart = (
+    sweet: Sweet,
+    options?: { quantity?: number; unitPrice?: number; unitLabel?: string },
+  ) => {
+    const unitPrice = options?.unitPrice ?? sweet.price;
+    const addQuantity = options?.quantity ?? 1;
+    const unitLabel = options?.unitLabel ?? (sweet.category === 'Chat' ? 'plate' : 'kg');
+
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === sweet.id);
+      // Try to match existing by id and unitLabel so different unit selections are separate lines
+      const existingItem = prevCart.find((item) => item.id === sweet.id && item.unitLabel === unitLabel);
       if (existingItem) {
-        return prevCart.map((item) => (item.id === sweet.id ? { ...item, quantity: item.quantity + 1 } : item));
+        return prevCart.map((item) =>
+          item.id === sweet.id && item.unitLabel === unitLabel
+            ? { ...item, quantity: item.quantity + addQuantity }
+            : item,
+        );
       }
-      return [...prevCart, { ...sweet, quantity: 1 }];
+
+      // Add new cart line with unit price and label and a unique cartId
+      const cartId = Date.now() + Math.floor(Math.random() * 1000);
+      return [...prevCart, { ...sweet, price: unitPrice, quantity: addQuantity, unitLabel, cartId }];
     });
+
     toast({
-      title: "Added to cart",
+      title: 'Added to cart',
       description: `${sweet.name} has been added to your cart.`,
     });
   };
 
-  const updateQuantity = (id: number, change: number) => {
+  const updateQuantity = (cartId: number, change: number) => {
     setCart((prevCart) => {
       return prevCart
         .map((item) => {
-          if (item.id === id) {
+          if (item.cartId === cartId) {
             const newQuantity = item.quantity + change;
             return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
           }
@@ -100,8 +118,8 @@ const Index = () => {
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+  const removeFromCart = (cartId: number) => {
+    setCart((prevCart) => prevCart.filter((item) => item.cartId !== cartId));
     toast({
       title: "Removed from cart",
       description: "Item has been removed from your cart.",
@@ -236,7 +254,7 @@ const Index = () => {
                     <div className="space-y-4">
                       {cart.map((item) => (
                         <div
-                          key={item.id}
+                          key={item.cartId}
                           className="flex gap-4 p-3 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-colors"
                         >
                           <div className="h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-muted/20 flex-shrink-0 border border-border/30">
@@ -255,7 +273,7 @@ const Index = () => {
                                 </h4>
                                 <p className="font-bold text-sm">₹{item.price * item.quantity}</p>
                               </div>
-                              <p className="text-xs text-muted-foreground mt-0.5">₹{item.price}/kg</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">₹{item.price}/{item.unitLabel ?? 'kg'}</p>
                             </div>
                             <div className="flex items-center gap-3">
                               <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-0.5 border border-border/50">
@@ -263,7 +281,7 @@ const Index = () => {
                                   size="icon"
                                   variant="ghost"
                                   className="h-6 w-6 rounded-md hover:bg-background shadow-sm"
-                                  onClick={() => updateQuantity(item.id, -1)}
+                                  onClick={() => updateQuantity(item.cartId, -1)}
                                 >
                                   <Minus className="h-3 w-3" />
                                 </Button>
@@ -272,7 +290,7 @@ const Index = () => {
                                   size="icon"
                                   variant="ghost"
                                   className="h-6 w-6 rounded-md hover:bg-background shadow-sm"
-                                  onClick={() => updateQuantity(item.id, 1)}
+                                  onClick={() => updateQuantity(item.cartId, 1)}
                                 >
                                   <Plus className="h-3 w-3" />
                                 </Button>
@@ -281,7 +299,7 @@ const Index = () => {
                                 size="icon"
                                 variant="ghost"
                                 className="h-7 w-7 ml-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => removeFromCart(item.id)}
+                                onClick={() => removeFromCart(item.cartId)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>

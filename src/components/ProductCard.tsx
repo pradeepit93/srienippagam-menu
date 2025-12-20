@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 
 interface ProductCardProps {
     sweet: Sweet;
-    onAddToCart: (sweet: Sweet) => void;
+    onAddToCart: (sweet: Sweet, options?: { quantity?: number; unitPrice?: number; unitLabel?: string }) => void;
 }
 
 export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
@@ -14,6 +14,8 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isInView, setIsInView] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
+    const [weight, setWeight] = useState<number>(1); // 1 = 1kg, 0.5 = 500g, 0.25 = 250g
+    const [quantity, setQuantity] = useState<number>(1);
 
     // Intersection Observer for lazy loading
     useEffect(() => {
@@ -104,17 +106,92 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
             <CardFooter className="p-4 pt-0 flex items-center justify-between gap-2 mt-auto border-t border-border/30 bg-muted/5 min-h-[3.5rem]">
                 <div className="flex flex-col">
                     <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Price</span>
-                    <div className="flex items-baseline gap-0.5">
-                        <span className="text-lg font-bold text-foreground font-serif">
-                            ₹{sweet.price}
-                        </span>
-                        <span className="text-muted-foreground text-[10px]">/kg</span>
+                    <div className="flex items-baseline gap-2">
+                        <div className="flex items-baseline gap-0.5">
+                            <span className="text-lg font-bold text-foreground font-serif">
+                                ₹{Math.round(sweet.price * weight)}
+                            </span>
+                            <span className="text-muted-foreground text-[10px]">/{weight === 1 ? 'kg' : `${weight * 1000}g`}</span>
+                        </div>
+
+                        {sweet.category === 'Chat' ? (
+                            <div className="flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="text-xs px-2 py-1 border border-border/30 bg-white rounded hover:bg-muted/50"
+                                >
+                                    -
+                                </button>
+                                <span className="text-xs px-2 min-w-[2rem] text-center">{quantity}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="text-xs px-2 py-1 border border-border/30 bg-white rounded hover:bg-muted/50"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="inline-flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    aria-pressed={weight === 0.25}
+                                    onClick={() => setWeight(0.25)}
+                                    className={
+                                        (weight === 0.25
+                                            ? 'bg-primary text-primary-foreground border-primary'
+                                            : 'bg-white text-foreground border-border/30') +
+                                        ' text-xs px-3 py-1 rounded border'
+                                    }
+                                >
+                                    250g
+                                </button>
+
+                                <button
+                                    type="button"
+                                    aria-pressed={weight === 0.5}
+                                    onClick={() => setWeight(0.5)}
+                                    className={
+                                        (weight === 0.5
+                                            ? 'bg-primary text-primary-foreground border-primary'
+                                            : 'bg-white text-foreground border-border/30') +
+                                        ' text-xs px-3 py-1 rounded border'
+                                    }
+                                >
+                                    500g
+                                </button>
+
+                                <button
+                                    type="button"
+                                    aria-pressed={weight === 1}
+                                    onClick={() => setWeight(1)}
+                                    className={
+                                        (weight === 1
+                                            ? 'bg-primary text-primary-foreground border-primary'
+                                            : 'bg-white text-foreground border-border/30') +
+                                        ' text-xs px-3 py-1 rounded border'
+                                    }
+                                >
+                                    1kg
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <Button
                     size="sm"
                     className="h-9 shadow-sm hover:shadow-md transition-all font-semibold text-xs px-4 bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={() => onAddToCart(sweet)}
+                    onClick={() => {
+                        if (sweet.category === 'Chat') {
+                            // For chat items, plates are discrete units (price per plate)
+                            onAddToCart(sweet, { quantity: quantity, unitPrice: sweet.price, unitLabel: 'plate' });
+                        } else {
+                            const unitPrice = Math.round(sweet.price * weight);
+                            const unitLabel = weight === 1 ? 'kg' : `${weight * 1000}g`;
+                            onAddToCart(sweet, { quantity: 1, unitPrice, unitLabel });
+                        }
+                    }}
                 >
                     <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
                     Add
