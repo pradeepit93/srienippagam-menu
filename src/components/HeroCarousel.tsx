@@ -14,7 +14,7 @@ interface HeroSlide {
 const heroSlides: HeroSlide[] = [
     {
         id: 1,
-        image: "/festival_special_banner.png",
+        image: "/festival_special_banner.webp",
         title: "Festival Special Sweets",
         subtitle: "Celebrate every moment with our authentic traditional sweets",
         badge: "Limited Time",
@@ -23,7 +23,7 @@ const heroSlides: HeroSlide[] = [
     },
     {
         id: 2,
-        image: "/seasonal_collection_banner.png",
+        image: "/seasonal_collection_banner.webp",
         title: "Season's Best Collection",
         subtitle: "Handpicked premium sweets made with finest ingredients",
         badge: "New Arrivals",
@@ -32,7 +32,7 @@ const heroSlides: HeroSlide[] = [
     },
     {
         id: 3,
-        image: "/special_offers_banner.png",
+        image: "/special_offers_banner.webp",
         title: "Special Offers",
         subtitle: "Get up to 20% off on selected sweets and snacks",
         badge: "Save Big",
