@@ -87,97 +87,101 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
                 </div>
             </CardHeader>
 
-            <CardContent className="p-4 flex-grow">
-                <div className="mb-1.5">
-                    {sweet.subCategory !== 'Other' && (
-                        <span className="text-[10px] font-semibold text-primary uppercase tracking-wider block mb-1">
+            <CardContent className="p-4 flex-grow flex flex-col">
+                <div className="h-5 mb-1">
+                    {sweet.subCategory !== 'Other' ? (
+                        <span className="text-[10px] font-semibold text-primary uppercase tracking-wider block">
                             {sweet.subCategory}
                         </span>
+                    ) : (
+                        <span className="text-[10px] font-semibold text-transparent uppercase tracking-wider block">
+                            &nbsp;
+                        </span>
                     )}
-                    <h3 className="text-base font-serif font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
-                        {sweet.name}
-                    </h3>
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed h-8 mb-1">
+                <h3 className="text-base font-serif font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1 min-h-[1.5rem]">
+                    {sweet.name}
+                </h3>
+                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[2rem] mt-1.5">
                     {sweet.description}
                 </p>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0 flex items-center justify-between gap-2 mt-auto border-t border-border/30 bg-muted/5 min-h-[3.5rem]">
-                <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Price</span>
-                    <div className="flex items-baseline gap-2">
+            <CardFooter className="p-4 pt-3 flex flex-col gap-3 mt-auto border-t border-border/30 bg-muted/5">
+                <div className="flex items-center justify-between w-full">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Price</span>
                         <div className="flex items-baseline gap-0.5">
                             <span className="text-lg font-bold text-foreground font-serif">
                                 ₹{Math.round(sweet.price * weight)}
                             </span>
                             <span className="text-muted-foreground text-[10px]">/{weight === 1 ? 'kg' : `${weight * 1000}g`}</span>
                         </div>
-
-                        {sweet.category === 'Chat' ? (
-                            <div className="flex items-center gap-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="text-xs px-2 py-1 border border-border/30 bg-white rounded hover:bg-muted/50"
-                                >
-                                    -
-                                </button>
-                                <span className="text-xs px-2 min-w-[2rem] text-center">{quantity}</span>
-                                <button
-                                    type="button"
-                                    onClick={() => setQuantity(quantity + 1)}
-                                    className="text-xs px-2 py-1 border border-border/30 bg-white rounded hover:bg-muted/50"
-                                >
-                                    +
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="inline-flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    aria-pressed={weight === 0.25}
-                                    onClick={() => setWeight(0.25)}
-                                    className={
-                                        (weight === 0.25
-                                            ? 'bg-primary text-primary-foreground border-primary'
-                                            : 'bg-white text-foreground border-border/30') +
-                                        ' text-xs px-3 py-1 rounded border'
-                                    }
-                                >
-                                    250g
-                                </button>
-
-                                <button
-                                    type="button"
-                                    aria-pressed={weight === 0.5}
-                                    onClick={() => setWeight(0.5)}
-                                    className={
-                                        (weight === 0.5
-                                            ? 'bg-primary text-primary-foreground border-primary'
-                                            : 'bg-white text-foreground border-border/30') +
-                                        ' text-xs px-3 py-1 rounded border'
-                                    }
-                                >
-                                    500g
-                                </button>
-
-                                <button
-                                    type="button"
-                                    aria-pressed={weight === 1}
-                                    onClick={() => setWeight(1)}
-                                    className={
-                                        (weight === 1
-                                            ? 'bg-primary text-primary-foreground border-primary'
-                                            : 'bg-white text-foreground border-border/30') +
-                                        ' text-xs px-3 py-1 rounded border'
-                                    }
-                                >
-                                    1kg
-                                </button>
-                            </div>
-                        )}
                     </div>
+
+                    {sweet.category === 'Chat' ? (
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                className="text-xs px-2 py-1 border border-border/30 bg-card rounded hover:bg-muted/50"
+                            >
+                                -
+                            </button>
+                            <span className="text-xs px-2 min-w-[2rem] text-center">{quantity}</span>
+                            <button
+                                type="button"
+                                onClick={() => setQuantity(quantity + 1)}
+                                className="text-xs px-2 py-1 border border-border/30 bg-card rounded hover:bg-muted/50"
+                            >
+                                +
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="inline-flex items-center gap-1">
+                            <button
+                                type="button"
+                                aria-pressed={weight === 0.25}
+                                onClick={() => setWeight(0.25)}
+                                className={
+                                    (weight === 0.25
+                                        ? 'bg-primary text-primary-foreground border-primary'
+                                        : 'bg-card text-foreground border-border/30') +
+                                    ' text-[10px] px-2 py-1 rounded border'
+                                }
+                            >
+                                250g
+                            </button>
+
+                            <button
+                                type="button"
+                                aria-pressed={weight === 0.5}
+                                onClick={() => setWeight(0.5)}
+                                className={
+                                    (weight === 0.5
+                                        ? 'bg-primary text-primary-foreground border-primary'
+                                        : 'bg-card text-foreground border-border/30') +
+                                    ' text-[10px] px-2 py-1 rounded border'
+                                }
+                            >
+                                500g
+                            </button>
+
+                            <button
+                                type="button"
+                                aria-pressed={weight === 1}
+                                onClick={() => setWeight(1)}
+                                className={
+                                    (weight === 1
+                                        ? 'bg-primary text-primary-foreground border-primary'
+                                        : 'bg-card text-foreground border-border/30') +
+                                    ' text-[10px] px-2 py-1 rounded border'
+                                }
+                            >
+                                1kg
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <Button
                     size="sm"
