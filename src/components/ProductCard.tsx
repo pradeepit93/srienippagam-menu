@@ -24,12 +24,12 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         setIsInView(true);
-                        observer.disconnect(); // Stop observing once in view
+                        observer.disconnect();
                     }
                 });
             },
             {
-                rootMargin: "50px", // Start loading 50px before entering viewport
+                rootMargin: "50px",
                 threshold: 0.01,
             }
         );
@@ -65,130 +65,120 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
         loadImage();
     }, [isInView, sweet.imageFile, sweet.category, sweet.name]);
 
+    const weightOptions = [
+        { value: 0.25, label: '250g' },
+        { value: 0.5, label: '500g' },
+        { value: 1, label: '1kg' },
+    ];
+
     return (
         <Card
             ref={cardRef}
-            className="group overflow-hidden hover:shadow-card-hover transition-all duration-300 border-border/40 flex flex-col h-full bg-card"
+            className="group overflow-hidden border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col h-full bg-card rounded-xl"
         >
-            <CardHeader className="p-0 relative z-0">
-                <div className="h-48 overflow-hidden bg-white flex items-center justify-center relative p-3">
+            {/* Image Section */}
+            <CardHeader className="p-0 relative">
+                <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center relative">
                     {isLoading ? (
-                        // Skeleton loader
-                        <div className="w-full h-full bg-gradient-to-r from-muted/50 via-muted/30 to-muted/50 animate-pulse rounded-lg" />
+                        <div className="w-full h-full bg-gradient-to-r from-muted/40 via-muted/20 to-muted/40 animate-pulse" />
                     ) : (
                         <img
                             src={imageSrc}
                             alt={sweet.name}
-                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
                         />
                     )}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-colors duration-300 pointer-events-none" />
                 </div>
             </CardHeader>
 
-            <CardContent className="p-4 flex-grow flex flex-col">
-                <div className="h-5 mb-1">
-                    {sweet.subCategory !== 'Other' ? (
-                        <span className="text-[10px] font-semibold text-primary uppercase tracking-wider block">
+            {/* Content Section */}
+            <CardContent className="p-5 flex-grow flex flex-col gap-2">
+                {/* Category Badge */}
+                <div className="h-4">
+                    {sweet.subCategory !== 'Other' && (
+                        <span className="text-[11px] font-semibold text-primary uppercase tracking-widest">
                             {sweet.subCategory}
-                        </span>
-                    ) : (
-                        <span className="text-[10px] font-semibold text-transparent uppercase tracking-wider block">
-                            &nbsp;
                         </span>
                     )}
                 </div>
-                <h3 className="text-base font-serif font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1 min-h-[1.5rem]">
+
+                {/* Product Name */}
+                <h3 className="text-lg font-serif font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-1">
                     {sweet.name}
                 </h3>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[2rem] mt-1.5">
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-grow">
                     {sweet.description}
                 </p>
             </CardContent>
 
-            <CardFooter className="p-4 pt-3 flex flex-col gap-3 mt-auto border-t border-border/30 bg-muted/5">
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Price</span>
-                        <div className="flex items-baseline gap-0.5">
-                            <span className="text-lg font-bold text-foreground font-serif">
+            {/* Footer Section */}
+            <CardFooter className="p-5 pt-4 flex flex-col gap-4 mt-auto border-t border-border/40 bg-muted/30">
+                {/* Price Row */}
+                <div className="flex items-end justify-between w-full">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                            Price
+                        </span>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-bold text-foreground font-serif tracking-tight">
                                 ₹{Math.round(sweet.price * weight)}
                             </span>
-                            <span className="text-muted-foreground text-[10px]">/{weight === 1 ? 'kg' : `${weight * 1000}g`}</span>
+                            <span className="text-muted-foreground text-xs font-medium">
+                                /{weight === 1 ? 'kg' : `${weight * 1000}g`}
+                            </span>
                         </div>
                     </div>
 
+                    {/* Weight Selector / Quantity */}
                     {sweet.category === 'Chat' ? (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5 bg-background border border-border/60 rounded-lg p-1">
                             <button
                                 type="button"
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="text-xs px-2 py-1 border border-border/30 bg-card rounded hover:bg-muted/50"
+                                className="w-8 h-8 flex items-center justify-center text-sm font-medium rounded-md hover:bg-muted transition-colors"
                             >
-                                -
+                                −
                             </button>
-                            <span className="text-xs px-2 min-w-[2rem] text-center">{quantity}</span>
+                            <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
                             <button
                                 type="button"
                                 onClick={() => setQuantity(quantity + 1)}
-                                className="text-xs px-2 py-1 border border-border/30 bg-card rounded hover:bg-muted/50"
+                                className="w-8 h-8 flex items-center justify-center text-sm font-medium rounded-md hover:bg-muted transition-colors"
                             >
                                 +
                             </button>
                         </div>
                     ) : (
-                        <div className="inline-flex items-center gap-1">
-                            <button
-                                type="button"
-                                aria-pressed={weight === 0.25}
-                                onClick={() => setWeight(0.25)}
-                                className={
-                                    (weight === 0.25
-                                        ? 'bg-primary text-primary-foreground border-primary'
-                                        : 'bg-card text-foreground border-border/30') +
-                                    ' text-[10px] px-2 py-1 rounded border'
-                                }
-                            >
-                                250g
-                            </button>
-
-                            <button
-                                type="button"
-                                aria-pressed={weight === 0.5}
-                                onClick={() => setWeight(0.5)}
-                                className={
-                                    (weight === 0.5
-                                        ? 'bg-primary text-primary-foreground border-primary'
-                                        : 'bg-card text-foreground border-border/30') +
-                                    ' text-[10px] px-2 py-1 rounded border'
-                                }
-                            >
-                                500g
-                            </button>
-
-                            <button
-                                type="button"
-                                aria-pressed={weight === 1}
-                                onClick={() => setWeight(1)}
-                                className={
-                                    (weight === 1
-                                        ? 'bg-primary text-primary-foreground border-primary'
-                                        : 'bg-card text-foreground border-border/30') +
-                                    ' text-[10px] px-2 py-1 rounded border'
-                                }
-                            >
-                                1kg
-                            </button>
+                        <div className="flex items-center gap-1 bg-background border border-border/60 rounded-lg p-1">
+                            {weightOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    aria-pressed={weight === option.value}
+                                    onClick={() => setWeight(option.value)}
+                                    className={`
+                                        px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200
+                                        ${weight === option.value
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                        }
+                                    `}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
                         </div>
                     )}
                 </div>
+
+                {/* Add Button */}
                 <Button
-                    size="sm"
-                    className="h-9 shadow-sm hover:shadow-md transition-all font-semibold text-xs px-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="w-full h-11 shadow-sm hover:shadow-lg transition-all duration-300 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
                     onClick={() => {
                         if (sweet.category === 'Chat') {
-                            // For chat items, plates are discrete units (price per plate)
                             onAddToCart(sweet, { quantity: quantity, unitPrice: sweet.price, unitLabel: 'plate' });
                         } else {
                             const unitPrice = Math.round(sweet.price * weight);
@@ -197,8 +187,8 @@ export const ProductCard = ({ sweet, onAddToCart }: ProductCardProps) => {
                         }
                     }}
                 >
-                    <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                    Add
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Add to Cart
                 </Button>
             </CardFooter>
         </Card>
