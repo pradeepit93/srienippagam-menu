@@ -1,23 +1,19 @@
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Search, ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { items as sweets, categories, Sweet, getSubCategories } from "@/data/items";
+import { useQuery } from "@tanstack/react-query";
+import { categories, Sweet, getSubCategories, fetchItems } from "@/data/items";
 import { ProductCard } from "@/components/ProductCard";
 import { MobileFilters } from "@/components/MobileFilters";
-import { CartImage } from "@/components/CartImage";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
-
-interface CartItem extends Sweet {
-  cartId: number;
-  quantity: number;
-  unitLabel?: string; // e.g., 'kg', '250g', 'plate'
-}
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { CartSheetContent, CartItem } from "@/components/CartSheet";
+import { SEO } from "@/components/SEO";
+import { Search, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Validation schema for order data
 const orderSchema = z.object({
@@ -34,43 +30,58 @@ const orderSchema = z.object({
 });
 
 const Index = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedSubCategory, setSelectedSubCategory] = useState("All");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("category") || "All";
+  const selectedSubCategory = searchParams.get("subCategory") || "All";
+
+  // Temporary state for search (we might not want to reflect every keystroke in URL)
   const [searchQuery, setSearchQuery] = useState("");
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [isCustomerDetailsOpen, setIsCustomerDetailsOpen] = useState(false);
 
-  // We can pick a random image for the hero or keep it hardcoded if we want a specific one
-  // For now let's just use the first item's image or a fallback
-  const heroImage = sweets.length > 0 ? sweets[0].image : "";
+  // Fetch items using React Query
+  const { data: sweets = [], isLoading, isError } = useQuery({
+    queryKey: ['sweets'],
+    queryFn: fetchItems,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   const availableSubCategories = useMemo(() => {
-    return getSubCategories(selectedCategory);
-  }, [selectedCategory]);
+    return getSubCategories(sweets, selectedCategory);
+  }, [sweets, selectedCategory]);
 
-  const filteredSweets = sweets
-    .filter((sweet) => {
-      const matchesCategory = selectedCategory === "All" || sweet.category === selectedCategory;
-      const matchesSubCategory =
-        selectedCategory === "All" || selectedSubCategory === "All" || sweet.subCategory === selectedSubCategory;
-      const matchesSearch =
-        sweet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        sweet.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSubCategory && matchesSearch;
-    })
-    .sort((a, b) => a.order - b.order);
+  const filteredSweets = useMemo(() => {
+    return sweets
+      .filter((sweet) => {
+        const matchesCategory = selectedCategory === "All" || sweet.category === selectedCategory;
+        const matchesSubCategory =
+          selectedCategory === "All" || selectedSubCategory === "All" || sweet.subCategory === selectedSubCategory;
+        const matchesSearch =
+          sweet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          sweet.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSubCategory && matchesSearch;
+      })
+      .sort((a, b) => a.order - b.order);
+  }, [sweets, selectedCategory, selectedSubCategory, searchQuery]);
 
   const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setSelectedSubCategory("All"); // Reset subcategory when main category changes
+    setSearchParams(prev => {
+      prev.set("category", category);
+      prev.set("subCategory", "All"); // Reset subcategory
+      return prev;
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubCategoryChange = (subCategory: string) => {
-    setSelectedSubCategory(subCategory);
+    setSearchParams(prev => {
+      prev.set("subCategory", subCategory);
+      return prev;
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -83,7 +94,7 @@ const Index = () => {
     const unitLabel = options?.unitLabel ?? (sweet.category === 'Chat' ? 'plate' : 'kg');
 
     setCart((prevCart) => {
-      // Try to match existing by id and unitLabel so different unit selections are separate lines
+      // Try to match existing by id and unitLabel
       const existingItem = prevCart.find((item) => item.id === sweet.id && item.unitLabel === unitLabel);
       if (existingItem) {
         return prevCart.map((item) =>
@@ -93,7 +104,7 @@ const Index = () => {
         );
       }
 
-      // Add new cart line with unit price and label and a unique cartId
+      // Add new cart line
       const cartId = Date.now() + Math.floor(Math.random() * 1000);
       return [...prevCart, { ...sweet, price: unitPrice, quantity: addQuantity, unitLabel, cartId }];
     });
@@ -126,14 +137,6 @@ const Index = () => {
     });
   };
 
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
-
-  const getTotalItems = () => {
-    return cart.reduce((total, item) => total + item.quantity, 0);
-  };
-
   const placeOrder = () => {
     if (cart.length === 0) {
       toast({
@@ -145,7 +148,8 @@ const Index = () => {
     }
 
     try {
-      // Validate order data
+      const getTotalPrice = () => cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
       const orderData = {
         items: cart.map((item) => ({
           name: item.name,
@@ -157,15 +161,13 @@ const Index = () => {
 
       orderSchema.parse(orderData);
 
-      // Create WhatsApp message string (without encoding yet)
       const orderItems = cart
-        .map((item, index) => `${index + 1}. ${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`)
+        .map((item, index) => `${index + 1}. ${item.name} x ${item.quantity} = ₹${item.price * item.quantity} `)
         .join("\n");
 
       const total = getTotalPrice();
-      const messageText = `*New Order Request* 🛍️\n------------------\n*Items:*\n${orderItems}\n\n*Total Amount: ₹${total}* 💰\n\n*Customer Details:*\nName: ${customerName || "Not Provided"}\nAddress: ${customerAddress || "Not Provided"}\n------------------\n_Sent via Sri Enippagam Web App_`;
+      const messageText = `* New Order Request * 🛍️\n------------------\n * Items:*\n${orderItems} \n\n * Total Amount: ₹${total}* 💰\n\n * Customer Details:*\nName: ${customerName || "Not Provided"} \nAddress: ${customerAddress || "Not Provided"} \n------------------\n_Sent via Sri Enippagam Web App_`;
 
-      // Validate message length (WhatsApp has limits)
       if (messageText.length > 2000) {
         toast({
           title: "Order too large",
@@ -194,198 +196,64 @@ const Index = () => {
     }
   };
 
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-lg font-medium text-muted-foreground animate-pulse">Loading menu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center max-w-md p-6">
+          <h2 className="text-2xl font-bold text-destructive">Unable to Load Menu</h2>
+          <p className="text-muted-foreground">We couldn't load the menu items. Please check your internet connection and try again.</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            {/* Mobile Logo / Brand */}
-            <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight text-primary">Sri Enippagam</h2>
-          </div>
+      <SEO
+        title={selectedCategory === "All" ? "Sri Enippagam - Authentic Indian Sweets" : `${selectedCategory} - Sri Enippagam`}
+        description={`Browse our ${selectedCategory} collection. Authentic traditional taste.`}
+      />
 
-          {/* Desktop Search */}
-          <div className="hidden md:block flex-1 max-w-xl">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search for sweets, snacks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9 md:h-10 bg-muted/50 border-transparent focus:bg-background focus:border-primary text-sm shadow-sm"
-              />
-            </div>
-          </div>
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        cartItemCount={cartItemCount}
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+        cartContent={
+          <CartSheetContent
+            cart={cart}
+            setIsCartOpen={setIsCartOpen}
+            updateQuantity={updateQuantity}
+            removeFromCart={removeFromCart}
+            customerName={customerName}
+            setCustomerName={setCustomerName}
+            customerAddress={customerAddress}
+            setCustomerAddress={setCustomerAddress}
+            isCustomerDetailsOpen={isCustomerDetailsOpen}
+            setIsCustomerDetailsOpen={setIsCustomerDetailsOpen}
+            placeOrder={placeOrder}
+          />
+        }
+      />
 
-          {/* Cart & Actions */}
-          <div className="flex items-center gap-2">
-            <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-              <SheetTrigger asChild>
-                <Button size="icon" variant="ghost" className="relative h-9 w-9 hover:bg-muted/50">
-                  <ShoppingCart className="h-5 w-5" />
-                  {getTotalItems() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center text-[10px] font-bold ring-2 ring-background animate-in zoom-in-50 duration-300">
-                      {getTotalItems()}
-                    </span>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-full sm:max-w-lg overflow-y-auto flex flex-col h-full">
-                <SheetHeader>
-                  <SheetTitle className="text-xl md:text-2xl font-serif">Your Cart</SheetTitle>
-                </SheetHeader>
-
-                <div className="flex-1 overflow-y-auto mt-6 -mr-4 pr-4">
-                  {cart.length === 0 ? (
-                    <div className="text-center py-20 flex flex-col items-center justify-center h-full">
-                      <div className="h-20 w-20 bg-muted/30 rounded-full flex items-center justify-center mb-6">
-                        <ShoppingCart className="h-10 w-10 text-muted-foreground" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground">Your cart is empty</h3>
-                      <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
-                        Looks like you haven't added any sweets yet. Start shopping to fill it up!
-                      </p>
-                      <Button variant="default" className="mt-6" onClick={() => setIsCartOpen(false)}>
-                        Start Shopping
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {cart.map((item) => (
-                        <div
-                          key={item.cartId}
-                          className="flex gap-4 p-3 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-colors"
-                        >
-                          <div className="h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-muted/20 flex-shrink-0 border border-border/30">
-                            <CartImage
-                              imageFile={item.imageFile}
-                              category={item.category}
-                              alt={item.name}
-                              className="w-full h-full object-contain p-1"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
-                            <div>
-                              <div className="flex justify-between items-start gap-2">
-                                <h4 className="font-semibold text-foreground text-sm line-clamp-1 font-serif">
-                                  {item.name}
-                                </h4>
-                                <p className="font-bold text-sm">₹{item.price * item.quantity}</p>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-0.5">₹{item.price}/{item.unitLabel ?? 'kg'}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-0.5 border border-border/50">
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-6 w-6 rounded-md hover:bg-background shadow-sm"
-                                  onClick={() => updateQuantity(item.cartId, -1)}
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="font-semibold w-6 text-center text-sm">{item.quantity}</span>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-6 w-6 rounded-md hover:bg-background shadow-sm"
-                                  onClick={() => updateQuantity(item.cartId, 1)}
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-7 w-7 ml-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => removeFromCart(item.cartId)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {cart.length > 0 && (
-                  <div className="mt-auto pt-6 border-t border-border bg-background">
-                    <div className="space-y-4 mb-6">
-                      <Collapsible open={isCustomerDetailsOpen} onOpenChange={setIsCustomerDetailsOpen}>
-                        <CollapsibleTrigger asChild>
-                          <button className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-2">
-                            <span>Add delivery details (Optional)</span>
-                            <ChevronDown
-                              className={`h-4 w-4 transition-transform ${isCustomerDetailsOpen ? "rotate-180" : ""}`}
-                            />
-                          </button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="space-y-3">
-                          <div className="space-y-2">
-                            <Input
-                              placeholder="Your name"
-                              value={customerName}
-                              onChange={(e) => setCustomerName(e.target.value)}
-                              className="h-9"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <textarea
-                              className="flex min-h-[50px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder="Delivery address"
-                              value={customerAddress}
-                              onChange={(e) => setCustomerAddress(e.target.value)}
-                            />
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-
-                      <div className="flex justify-between items-center text-sm text-muted-foreground pt-2">
-                        <span>Subtotal ({getTotalItems()} items)</span>
-                        <span>₹{getTotalPrice()}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-base font-bold text-foreground">
-                        <span>Total</span>
-                        <span className="text-xl font-serif">₹{getTotalPrice()}</span>
-                      </div>
-                    </div>
-                    <Button
-                      size="lg"
-                      className="w-full shadow-lg font-bold text-base h-12 bg-primary hover:bg-primary/90 text-primary-foreground"
-                      onClick={placeOrder}
-                    >
-                      Place Order on WhatsApp
-                    </Button>
-                  </div>
-                )}
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-
-        {/* Mobile Search - Visible only on mobile below header */}
-        <div className="md:hidden border-t border-border/40 bg-background/95 px-4 py-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search sweets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 w-full bg-muted/50 border-transparent focus:bg-background focus:border-primary text-sm shadow-sm"
-            />
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Carousel - Scrollable Promotional Banners */}
       <HeroCarousel />
 
       <main className="container mx-auto px-4 py-6">
-        {/* Top Filters */}
         <div className="sticky top-[105px] md:top-[64px] z-40 bg-background pt-2 -mx-4 px-4 mb-6">
           <MobileFilters
             categories={categories}
@@ -397,7 +265,6 @@ const Index = () => {
           />
         </div>
 
-        {/* Product Grid */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">
             {selectedCategory === "All" ? "All Products" : selectedCategory}
@@ -433,7 +300,7 @@ const Index = () => {
               className="mt-4"
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory("All");
+                handleCategoryChange("All");
               }}
             >
               Clear All Filters
@@ -442,60 +309,7 @@ const Index = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-card border-t border-border mt-auto">
-        <div className="container mx-auto px-4 py-6 md:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center md:text-left">
-              <h2 className="text-lg font-bold text-foreground mb-2">Sri Enippagam</h2>
-              <p className="text-muted-foreground text-xs max-w-xs mx-auto md:mx-0">
-                Delivering happiness since 1985. Authentic recipes, premium ingredients.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-semibold text-foreground mb-2 text-sm">Quick Links</h3>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li>
-                  <button onClick={() => handleCategoryChange("All")} className="hover:text-primary transition-colors">
-                    Home
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => handleCategoryChange("Sweets")}
-                    className="hover:text-primary transition-colors"
-                  >
-                    Sweets
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => handleCategoryChange("Karam")}
-                    className="hover:text-primary transition-colors"
-                  >
-                    Snacks
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-center md:text-right">
-              <h3 className="font-semibold text-foreground mb-2 text-sm">Contact Us</h3>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p>📍 New Scheme Rd, Pollachi, Tamil Nadu 642001</p>
-                <p>☎️ +91 88701 44490</p>
-                <p>📧 order@srienippagam.com</p>
-                <p>🕐 Open Daily 9 AM - 9 PM</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border/50 mt-6 pt-6 text-center text-[10px] text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Sri Enippagam. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer onNavigate={handleCategoryChange} />
     </div>
   );
 };
